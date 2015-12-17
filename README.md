@@ -20,3 +20,13 @@ client := verifalia.NewClient("Account SID", "Auth Token")
 emails := []string{"john.smith@example.com", "foo@example.net"}
 resp, err := client.Validate(emails)
 ```
+
+### Get status of queued job ###
+Query the Email Validations API for a specific job result using the unique job ID.
+Pass the unique ID as an argument to the 'Query' method on the client.
+Response is same as 'Validate' method on the client.
+```go
+client := verifalia.NewClient("Account SID", "Auth Token")
+resp, err := client.Query("Unique ID")
+```
+
