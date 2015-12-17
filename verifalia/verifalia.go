@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -121,10 +122,49 @@ func (c *Client) Validate(emails []string) (*Response, error) {
 	}
 	// close request body after "Validate" method executes
 	defer resp.Body.Close()
+	return buildResponse(resp)
+}
 
+// Query the Email Validations API for specific validation job's result.
+// In order to use this API, you need to pass a unique job ID as a string argument.
+// The email validation job must already be queued or completed on the server
+// or else use 'Validate' to queue a new job.
+// Response returned by this API is available in "Data" struct.
+// Response is same as 'Validate' API.
+// GET: https://api.verifalia.com/v1.1/email-validations/{uniqueID}
+func (c *Client) Query(uniqueID string) (*Response, error) {
+	if uniqueID == "" {
+		err := errors.New("unique job ID should not be an empty string")
+		log.Fatalln(err)
+		return nil, err
+	}
+	// create the request URL using uniqueID
+	url := fmt.Sprintf("email-validations/%v", uniqueID)
+	// build request object for email validation job status API
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+	log.Println(req.URL)
+	// send request to the API
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+		return nil, err
+	}
+	// close request body after "Query" method executes
+	defer resp.Body.Close()
+	return buildResponse(resp)
+}
+
+// Since server response is same for 'Validate' and 'Query',
+// extract it out in a separate method which will be used by both methods.
+// This is a private method not exported by the package.
+func buildResponse(resp *http.Response) (*Response, error) {
 	// build a "Response" object from API response body
 	r := Response{}
-	err = json.NewDecoder(resp.Body).Decode(&r.Data)
+	err := json.NewDecoder(resp.Body).Decode(&r.Data)
 	if err != nil {
 		log.Fatalln(err)
 		return nil, err
