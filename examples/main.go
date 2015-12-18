@@ -21,10 +21,17 @@ func main() {
 	fmt.Printf("Server response:\t%+v\n", resp.Data)
 
 	fmt.Println("-------------> Query")
-	resp, err := c.Query(resp.UniqueID)
+	resp, err = c.Query(resp.UniqueID)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Response:\t%+v\n", resp)
 	fmt.Printf("Server response:\t%+v\n", resp.Data)
+
+	fmt.Println("-------------> Delete")
+	resp, err = c.Delete(resp.UniqueID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Response:\t%+v\n", resp)
 }
