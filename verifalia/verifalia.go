@@ -15,7 +15,7 @@ import (
 
 const (
 	libraryVersion = "0.1"
-	defaultBaseUrl = "https://api.verifalia.com/v1.1/"
+	defaultBaseUrl = "https://api.verifalia.com/v1.2/"
 	userAgent      = "go-verifalia/" + libraryVersion
 	contentType    = "application/json"
 )
