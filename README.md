@@ -11,7 +11,7 @@ To learn more about Verifalia, please visit http://verifalia.com
 import "github.com/adityashedge/go-verifalia/verifalia"
 ```
 
-### Validate Emails ###
+### Validate emails ###
 Construct a new Verifalia client, then use the client to access different API of Verifalia.  
 To create a job for validating emails, create a client and call the 'Validate' method on the client,
 passing the emails as an argument.
@@ -28,5 +28,15 @@ Response is same as 'Validate' method on the client.
 ```go
 client := verifalia.NewClient("Account SID", "Auth Token")
 resp, err := client.Query("Unique ID")
+```
+
+### Delete an existing job ###
+Delete a specific validation job using the unique job ID.
+Pass the unique ID as an argument to the 'Delete' method on the client.
+Returns status 200(OK) when job deleted else returns status 406(Not Acceptable).
+Returns status 404(Not Found) when job does not exist.
+```go
+client := verifalia.NewClient("Account SID", "Auth Token")
+resp, err := client.Delete("Unique ID")
 ```
 
