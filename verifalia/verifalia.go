@@ -15,7 +15,7 @@ import (
 
 const (
 	libraryVersion = "0.1"
-	defaultBaseUrl = "https://api.verifalia.com/v1.2/"
+	defaultBaseURL = "https://api.verifalia.com/v1.2/"
 	userAgent      = "go-verifalia/" + libraryVersion
 	contentType    = "application/json"
 )
@@ -34,20 +34,20 @@ type Client struct {
 	UserAgent string
 }
 
-// Returns a new Verifalia API client.
+// NewClient returns a new Verifalia API client.
 // It requires account SID and auth token which are used for basic http authentication
 func NewClient(accountSID, authToken string) *Client {
 	if accountSID == "" || authToken == "" {
 		return nil
 	}
 
-	baseUrl, _ := url.Parse(defaultBaseUrl)
+	baseURL, _ := url.Parse(defaultBaseURL)
 
 	c := &Client{
 		AccountSID: accountSID,
 		AuthToken:  authToken,
 		UserAgent:  userAgent,
-		BaseURL:    baseUrl,
+		BaseURL:    baseURL,
 	}
 	return c
 }
@@ -91,7 +91,7 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
-// Query the Email Validations API with an array of emails to validate.
+// Validate calls the Email Validations API with an array of emails to validate.
 // Response returned by this API is available in "Data" struct.
 // POST: https://api.verifalia.com/v1.1/email-validations
 // Emails to validate are passed as a slice of string.
@@ -125,12 +125,9 @@ func (c *Client) Validate(emails []string) (*Response, error) {
 	return buildResponse(resp)
 }
 
-// Query the Email Validations API for specific validation job's result.
-// In order to use this API, you need to pass a unique job ID as a string argument.
-// The email validation job must already be queued or completed on the server
-// or else use 'Validate' to queue a new job.
-// Response returned by this API is available in "Data" struct.
-// Response is same as 'Validate' API.
+// Query calls the Email Validations API for specific validation job's result with a unique job Id
+// The job must already be queued or completed on the server or else use 'Validate' to queue a new job.
+// Response returned by this API is available in "Data" struct and is same as 'Validate' API.
 // GET: https://api.verifalia.com/v1.1/email-validations/{uniqueID}
 func (c *Client) Query(uniqueID string) (*Response, error) {
 	if uniqueID == "" {
@@ -138,7 +135,7 @@ func (c *Client) Query(uniqueID string) (*Response, error) {
 		log.Fatalln(err)
 		return nil, err
 	}
-	// create the request URL using uniqueID
+	// create the request URL using a uniqueID
 	url := fmt.Sprintf("email-validations/%v", uniqueID)
 	// build request object for email validation job status API
 	req, err := c.NewRequest("GET", url, nil)
@@ -158,8 +155,7 @@ func (c *Client) Query(uniqueID string) (*Response, error) {
 	return buildResponse(resp)
 }
 
-// Query the Verifalia API to delete a specific validation job.
-// In order to use this API, you need to pass a unique job ID as a string argument.
+// Delete calls the Verifalia API to delete a specific validation job with a unique job ID.
 // The email validation job must be completed on the server or else server will return 406
 // DELETE: https://api.verifalia.com/v1.1/email-validations/{uniqueID}
 func (c *Client) Delete(uniqueID string) (*Response, error) {
@@ -224,13 +220,13 @@ type Request struct {
 	Entries []inputEmail `json:"entries"`
 }
 
-// All information about an email in a validation job is represented by an "Entry" struct
+// Entry represents all information about an email in a validation job.
 type Entry struct {
 	InputData                   string     `json:"inputData"`
 	Status                      string     `json:"status"`
 	CompletedOn                 *time.Time `json:"completedOn"`
 	EmailAddress                string     `json:"emailAddress"`
-	AsciiEmailAddressDomainPart string     `json:"asciiEmailAddressDomainPart"`
+	ASCIIEmailAddressDomainPart string     `json:"asciiEmailAddressDomainPart"`
 	EmailAddressLocalPart       string     `json:"emailAddressLocalPart"`
 	EmailAddressDomainPart      string     `json:"emailAddressDomainPart"`
 	HasInternationalDomainName  bool       `json:"hasInternationalDomainName"`
@@ -241,14 +237,14 @@ type Entry struct {
 	IsCatchAllFailure           bool       `json:"isCatchAllFailure"`
 	IsSuccess                   bool       `json:"isSuccess"`
 	IsSyntaxFailure             bool       `json:"isSyntaxFailure"`
-	IsDnsFailure                bool       `json:"isDnsFailure"`
-	IsSmtpFailure               bool       `json:"isSmtpFailure"`
+	IsDNSFailure                bool       `json:"isDnsFailure"`
+	IsSMTPFailure               bool       `json:"isSmtpFailure"`
 	IsMailboxFailure            bool       `json:"isMailboxFailure"`
 	IsTimeoutFailure            bool       `json:"isTimeoutFailure"`
 	IsNetworkFailure            bool       `json:"isNetworkFailure"`
 }
 
-// Data returned by Verifalia for an email validation job is represented by "Data" struct
+// Data represents all the data returned by Verifalia for an email validation job.
 type Data struct {
 	UniqueID      string     `json:"uniqueID"`
 	EngineVersion string     `json:"engineVersion"`
@@ -261,8 +257,8 @@ type Data struct {
 	} `json:"progress"`
 }
 
-// All API response will be represented by general purpose "Response" struct
-// Response returned after an email validation job is represented by "Data" struct
+// Response is a general purpose struct to represent API response.
+// API response returned after an email validation job is represented by "Data" struct
 // Data is pointer so we can ignore it for DELETE job as it will be nil
 // Status code represents if job was queued, executed or rejected by Verifalia
 // Location stores the next API location after current request.
